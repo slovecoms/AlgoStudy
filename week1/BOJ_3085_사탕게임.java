@@ -1,139 +1,97 @@
-package week1;
+package Algo_2022;
 
-import java.util.Scanner;
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
 
-public class 사탕게임 {
+public class BOJ_사탕_게임_2 {
+	// 옮기고
+	// 행,열 체크하고
+	// 원복하고
+	// 행*열 갯수 만큼 반복
+	static int N;
+	static char[][] arr;
 
-	static int N; // 보드의 크기 (3 ≤ N ≤ 50)
-	static char[][] arr; // 보드
-	static int ans = Integer.MIN_VALUE;
-	public static void main(String[] args) {
-		// TODO Auto-generated method stub
-			
-		Scanner sc = new Scanner(System.in);
-		N = sc.nextInt(); 
+	public static void main(String[] args) throws IOException {
+		BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
+		N = Integer.parseInt(br.readLine());
 		arr = new char[N][N];
-		
-		for (int r = 0; r < N; r++) {
-			String str = sc.next();
-			for (int c = 0; c < N; c++) {
-				arr[r][c] = str.charAt(c);
-			}
-		} // 보드 세팅 완료
-		// 빨간색: C, 파란색: P, 초록색: Z, 노란색: Y
-		
-//		print();
-		
-		// 완전탐색
-		for (int r = 0; r < N-1; r++) {
-			for (int c = 0; c < N-1; c++) {
-				
-//			바꿀 좌표 : r,c
-			//r+1 N미만인지 확인 후 오른쪽과 바꾸기(swap)
-			if (arr[r][c]!=arr[r+1][c]) {
-				// 1. 경계선 체크 후, 바꾸기
-				swap(r,c,r+1,c);
-				
-				// 2. 해당 좌표에서 최대 개수 탐색 (바뀐 좌표만 탐색해서 시간 줄이기 )
-				check(r,c);
-				check(r+1,c);
-				
-				// 3. 원복  
-				swap(r+1,c,r,c);
-				
-			}
-				
-			//c+1 N미만인지 확인 후 아래쪽과 바꾸기(swap)
-			if(c+1 < N) {
-				// 1. 경계선 체크 후, 바꾸기
-				swap(r,c,r,c+1);
-				
-				// 2. 해당 좌표애서 최대 개수 탐색(바뀐 좌표만 탐색해서 시간 줄이기) 
-				check(r,c);
-				check(r,c+1);
-				
-				// 3. 원복
-				swap(r,c+1,r,c);
-				
-			}
-				
-
-			
+		for (int i = 0; i < N; i++) {
+			String str = br.readLine();
+			for (int j = 0; j < N; j++) {
+				arr[i][j] = str.charAt(j);
 			}
 		}
+		// print();
+		// 행,열 방향으로 다른지 체크, 다르면 함수 시작
+		int res = 0;
+		for (int i = 0; i < N; i++) {
+			for (int j = 0; j < N; j++) {
+				// 행
+				if (i + 1 < N) {
+					char temp = arr[i][j];
+					arr[i][j] = arr[i + 1][j];
+					arr[i + 1][j] = temp;
+					res = Math.max(res, check());
+					temp = arr[i][j];
+					arr[i][j] = arr[i + 1][j];
+					arr[i + 1][j] = temp;
+				}
+				// 열
+				if (j + 1 < N) {
+					char temp = arr[i][j];
+					arr[i][j] = arr[i][j + 1];
+					arr[i][j + 1] = temp;
+					res = Math.max(res, check());
+					temp = arr[i][j];
+					arr[i][j] = arr[i][j + 1];
+					arr[i][j + 1] = temp;
+				}
 				
-		
-		
-		System.out.println(ans);
-	}
-	
-	private static void swap(int r, int c, int i, int j) {
-		// TODO Auto-generated method stub
-		char temp = arr[r][c];
-		arr[r][c] = arr[i][j];
-		arr[i][j] = temp;
-		
+
+			}
+		}
+		System.out.println(res);
 	}
 
-	private static void check(int r, int c) {
-		// TODO Auto-generated method stub
-		
-		// 행 탐색 
-			int cntR = 1;
-			int nr = r-1;
-//			arr[r][c] 위로 탐색
-			while (nr>=0) {
-				if(arr[nr][c] == arr[r][c]) {
-					cntR++;
-					nr--;
-				}else {
-					break;
-				}	
+	private static int check() {
+		// 행,열의 최댓값, 결과의 최댓값
+		int row = 0, col = 0, res = 0;
+		for (int i = 0; i < N; i++) {
+			// 행
+			// 최소 1개
+			int cnt=1;
+			for (int j = 0; j < N; j++) {
+				if (j + 1 < N) {
+					if (arr[j + 1][i] == arr[j][i]) {
+						cnt++;
+					} else {
+						cnt = 1;
+					}
+					row = Math.max(row, cnt);
+				}
 			}
-			
-//			arr[r][c] 아래로 탐색 
-			nr = r+1;
-			while(nr<arr.length) {
-				if(arr[nr][c] == arr[r][c]) {
-					cntR++;
-					nr++;
-				}else {
-					break;
-				}	
+			// 열
+			cnt = 1;
+			for (int j = 0; j < N; j++) {
+				if (j + 1 < N) {
+					if (arr[i][j + 1] == arr[i][j]) {
+						cnt++;
+					} else {
+						cnt = 1;
+					}
+					col = Math.max(col, cnt);
+				}
 			}
-		
-		
-		// 열 탐색 
-			int cntC = 1;
-			int nc = c-1;
-//			arr[r][c] 왼쪽으로 탐색
-			while (nc>=0) {
-				if(arr[r][nc] == arr[r][c]) {
-					cntC++;
-					nc--;
-				}else {
-					break;
-				}	
-			}
-			
-//			arr[r][c] 오른쪽으로 탐색 
-			nc =c+1;
-			while(nc<arr.length) {
-				if(arr[r][nc] == arr[r][c]) {
-					cntC++;
-					nc++;
-				}else {
-					break;
-				}	
-			}
-			
-			ans = Math.max(ans, Math.max(cntR, cntC));
-		
+			res = Math.max(row, col);
+		}
+		return res;
 	}
-	private static void print() {
-		for (int r = 0; r < N; r++) {
-			for (int c = 0; c < N; c++) {
-				System.out.print(arr[r][c]);
+
+	static void print() {
+		for (int i = 0; i < N; i++) {
+			for (int j = 0; j < N; j++) {
+				System.out.print(arr[i][j] + " ");
 			}
 			System.out.println();
 		}
